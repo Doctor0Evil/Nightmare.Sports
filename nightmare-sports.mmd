@@ -1,0 +1,33 @@
+graph TD
+  AEvent_Stimulus --> BFast_Fear_Mode
+  BFast_Fear_Mode --> CPhysio_Markers_HRV_Coherence
+  BFast_Fear_Mode --> DAffectiveTone_PsychRisk
+
+  CPhysio_Markers_HRV_Coherence --> EFearWeightProfile
+  DAffectiveTone_PsychRisk      --> EFearWeightProfile
+
+  EFearWeightProfile --> FPolicy_Response
+  FPolicy_Response -->|avoid/soften| GSafe_Shells
+  FPolicy_Response -->|compete| HNightmare_Sports_Arena
+
+  subgraph Sleep_Gates
+    ISleepStage_N2N3
+    JUncertainty_Question
+    KGsafe
+    LE_S1mR_Es
+  end
+
+  ISleepStage_N2N3 --> KGsafe
+  JUncertainty_Question --> KGsafe
+  KGsafe --> LE_S1mR_Es
+  LE_S1mR_Es --> HNightmare_Sports_Arena
+
+  subgraph Nightmare_Sports
+    HNightmare_Sports_Arena
+    MScored_Objectives_no_karma
+    NInstant_Escape_Routes
+  end
+
+  HNightmare_Sports_Arena --> MScored_Objectives_no_karma
+  HNightmare_Sports_Arena --> NInstant_Escape_Routes
+  HNightmare_Sports_Arena --> OAggregated_Research_Metrics
