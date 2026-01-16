@@ -1,0 +1,32 @@
+graph TD
+    Q[QuantumConsciousness] --> DS[DreamState]
+    DS --> EGate[Eligibility Gate]
+    DS --> N3Load[N3 emotion load]
+    DS --> Time[20-40 min window]
+    DS --> StageN2N3[N2/N3 only]
+    DS --> Arousal[Arousal <= arousalmax]
+    DS --> AuraOK[Immersion/Affect <= aurasafetyband]
+    N3Load --> N3Gate[N3EmotionalGateOpen]
+    EGate --> RiskOK[RiskOK: R <= Rmax & E >= Emin]
+    Time --> BaseOK[BaseEligibilityOK]
+    StageN2N3 --> BaseOK
+    Arousal --> BaseOK
+    AuraOK --> BaseOK
+    RiskOK --> BaseOK
+    BaseOK -->|false| Shells[Safe Shells / Neutral]
+    BaseOK -->|true| ArcheSel[Archetype Selector]
+    ArcheSel --> Rest[Reconstruction / Restoration]
+    ArcheSel --> Rehearse[Rehearsal]
+    BaseOK --> EmoCheck[EmotionalArcheGate]
+    N3Gate --> EmoCheck
+    EmoCheck -->|false| EmoNeutral[Neutral / soft affect]
+    EmoCheck -->|true| EmoHot[Anger-valve / combat-like]
+    EmoHot --> ZonesCombat[Combat-like zones<br/>PrimalCombatArchetype]
+    EmoNeutral --> ZonesNeutral[Neutral affect zones]
+    Rest --> ZonesRest[Restoration / exploration zones]
+    Rehearse --> ZonesRehearse[Rehearsal zones]
+    ZonesCombat --> WholenessAnchor[WholenessAnchor<br/>Integration & Grounding]
+    ZonesRest --> WholenessAnchor
+    ZonesRehearse --> WholenessAnchor
+    ZonesNeutral --> WholenessAnchor
+    WholenessAnchor --> Exit[Return to Wake Equilibrium]
