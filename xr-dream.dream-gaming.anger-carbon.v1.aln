@@ -1,0 +1,67 @@
+aln
+aln
+aln
+destination-path,xr-dream.dream-gaming.anger-carbon.v1.aln
+QPU.Datashard,Dream-gaming anger discharge, console offload, and eligibility controls
+
+SECTION,SUBJECT-STATE
+ROW,subject,subject,scalar,subjectid,,string,primarykey,Augmented user ID
+ROW,subject,subject,enum,sleepstage,unknown,string,wake,N1,N2,N3,REM,unknown,Scored sleep stage
+ROW,subject,subject,scalar,psychriskscore,0.0,float,range0,1,Composite psych risk R
+ROW,subject,subject,scalar,sleeptoken,0.0,float,range0,1,Sleep pressure S from actigraphy/circadian
+ROW,subject,subject,scalar,enstasisscore,1.0,float,range0,1,Inner stability Es
+ROW,subject,subject,flag,hasdaytimeactivityproof,false,bool,nonnull,True when safe activityfatigue earned
+
+SECTION,DREAM-GAMING-METRICS
+ROW,dream,dream,scalar,dreamsessionid,,string,primarykey,Night/session identifier
+ROW,dream,dream,scalar,dreamgamingminutes,0,int,0,Total dream-gaming minutes (all scenes)
+ROW,dream,dream,scalar,anger_tagged_minutes,0,int,0,Minutes in anger-tagged arenas
+ROW,dream,dream,scalar,consoleminutesbaseline,0,int,0,Baseline console minutes (cohort)
+ROW,dream,dream,scalar,consoleminutescurrent,0,int,0,Observed console minutes after adoption
+ROW,dream,dream,scalar,DreamGamingCarbonIndex,0.0,float,range-10,10,Net kgCO2 delta vs console baseline
+ROW,dream,dream,scalar,ConsoleOffloadIntensity,0.0,float,range0,1,Normalized console-offload intensity
+
+SECTION,DADI-FIELDS
+ROW,dadi,session,scalar,physio_arousal_delta,0.0,float,range0,1,LF/HF HRV + frontal delta/theta-gamma delta
+ROW,dadi,session,scalar,dream_intensity_score,0.0,float,range0,1,Structured vividness/affect score
+ROW,dadi,session,scalar,behavioral_relief_score,0.0,float,range0,1,Change in anger/urge-to-act scales
+ROW,dadi,session,scalar,safety_gate_fraction,0.0,float,range0,1,Fraction of anger epochs with safe StabilityScore
+ROW,dadi,session,scalar,DADI_value,0.0,float,range0,1,Computed Dream Anger Discharge Index
+
+SECTION,ELIGIBILITY-POLICY
+ROW,elig,policy,scalar,eligibilityE,0.0,float,range0,1,Eligibility scalar E=S*(1-R)*Es
+ROW,elig,policy,scalar,eligibilityEmin,0.50,float,range0,1,Minimum E for dream-gaming entry
+ROW,elig,policy,scalar,psychriskRmax,0.35,float,range0,1,Maximum allowed psychriskscore
+ROW,elig,policy,scalar,minactivityproof,6000,int,0,Minimum daily steps or equivalent
+ROW,elig,policy,scalar,dreamsessionmaxpernightmin,90,int,range10,240,Max dream-gaming minutes/night
+
+SECTION,NEURORIGHTS-POLICY
+ROW,rights,policy,flag,mentalprivacy,true,bool,nonwaivable,No raw dream content or inner speech exported
+ROW,rights,policy,flag,cognitiveliberty,true,bool,nonwaivable,Right to refuse dream-gaming or tracking
+ROW,rights,policy,flag,mentalintegrity,true,bool,nonwaivable,No harmful modulation or forced arousal
+ROW,rights,policy,flag,nopunitivexr,true,bool,nonwaivable,No punishment, confinement, or leverage via XR
+ROW,rights,policy,flag,noncommercialneuraldata,true,bool,nonwaivable,Neural/sleep data never sold
+ROW,rights,policy,flag,SoulNonaddressable,true,bool,nonwaivable,Soul never gets IDs, balances, or APIs
+
+SECTION,RUNTIME-RULES
+ROW,rule,rule,expression,ComputeEligibilityE, eligibilityE sleeptoken 1.0 - psychriskscore enstasisscore,string,readonly,E = S*(1-R)*Es
+ROW,rule,rule,condition,AllowDreamGaming, sleepstage IN N2,N3 AND hasdaytimeactivityproof true AND psychriskscore psychriskRmax AND eligibilityE eligibilityEmin,string,readonly,Gate dream-gaming on sleep, risk, and activity
+ROW,rule,rule,condition,ApplyDreamLoopAddictionBrake, IF dreamgamingminutes dreamsessionmaxpernightmin THEN blocknewdreamgamingsessions true,string,readonly,Hard nightly cap to avoid loops
+ROW,rule,rule,expression,ComputeDADI, DADI_value 0.4*behavioral_relief_score + 0.3*dream_intensity_score + 0.3*safety_gate_fraction,string,readonly,Infra-only anger discharge index
+ROW,rule,rule,expression,ComputeDreamGamingCarbonIndex, DreamGamingCarbonIndex consoleminutesbaseline*carbonbaselinekgperhour - consoleminutescurrent*carbonbaselinekgperhour - dreamgamingminutes*carbonxrkgperhour/60.0,string,readonly,Approx kgCO2 delta vs all-console baseline
+ROW,rule,rule,expression,ComputeConsoleOffloadIntensity, ConsoleOffloadIntensity max0.0, min1.0, (consoleminutesbaseline - consoleminutescurrent) max1, consoleminutesbaseline,string,readonly,Normalized console offload intensity
+ROW,rule,rule,condition,EnforceInnerContentFirewall, forbidop if input in dreamcontent,innerspeech,soultags and target in eligibilityE,DADI_value,DreamGamingCarbonIndex,evilrate,string,readonly,Dream content never drives safety or analytics
+ROW,rule,rule,condition,EnforceNoncommercialTelemetry, forbidop if target in adtargeting,pricing,creditscoring and source in psychriskscore,sleeptoken,EEG,HRV,dreamtags,string,readonly,Neural telemetry barred from commercial use
+
+SECTION,LEDGER
+ROW,ledger,ledger,scalar,eventid,,string,primarykey,Event ID
+ROW,ledger,ledger,enum,eventtype,,string,dream-gaming-start,dream-gaming-stop,safe-teleport,loop-brake,anger-arena-entry,anger-arena-exit,Event type
+ROW,ledger,ledger,scalar,subjectid,,string,refsubject,Linked subject
+ROW,ledger,ledger,scalar,eligibilityEsnapshot,,float,range0,1,Eligibility at event
+ROW,ledger,ledger,scalar,psychriskscoresnapshot,,float,range0,1,Risk at event
+ROW,ledger,ledger,scalar,DADIsnapshot,,float,range0,1,DADI cohort snapshot at event time
+ROW,ledger,ledger,scalar,DreamGamingCarbonIndexsnapshot,,float,range-10,10,Carbon index at event
+ROW,ledger,ledger,flag,neurorightsinvariantsheld,true,bool,nonnull,Assert neurorights baseline respected
+ROW,ledger,ledger,flag,noscoringapplied,true,bool,nonnull,Assert no punitive or reputational scoring
+
+FOOTER,END-OF-SHARD
