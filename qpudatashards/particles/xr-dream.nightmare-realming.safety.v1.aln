@@ -1,0 +1,87 @@
+aln aln
+destination-path,xr-dream.nightmare-realming.safety.v1.aln
+QPU.Datashard,Nightmare_Realming core safety + routing,augmented-citizen only
+
+SECTION,META
+ROW,meta,core,scalar,shardid,nightmare-realming-safety-v1,string,primarykey,Shard identifier
+ROW,meta,core,scalar,version,1.0.0,string,immutable,Schema version
+ROW,meta,core,scalar,scope,augmentedcitizen,string,immutable,Organic-CPU neurotech only
+ROW,meta,core,scalar,jurisdictionprimary,CH-GE|EU-BE|CL-SN|US-CA|US-AZ,string,nonnull,Neurorights envelope
+
+SECTION,EPOCH
+ROW,epoch,epochid,scalar,,int,primarykey,Unique epoch index
+ROW,epoch,subjectid,scalar,,string,pseudonymous,Pseudonymous subject key
+ROW,epoch,cohortid,scalar,,string,nonnull,Study or game cohort
+ROW,epoch,site,scalar,,string,GenevaBrusselsSantiagoLaJollaPhoenix,string,nonnull,Deployment site
+ROW,epoch,nightindex,scalar,,int,range0,90,Night counter
+
+ROW,epoch,pWake,scalar,,float,range0,1,Stage posterior Wake
+ROW,epoch,pN1,scalar,,float,range0,1,Stage posterior N1
+ROW,epoch,pN2,scalar,,float,range0,1,Stage posterior N2
+ROW,epoch,pN3,scalar,,float,range0,1,Stage posterior N3
+ROW,epoch,pREM,scalar,,float,range0,1,Stage posterior REM
+ROW,epoch,dn2n3,scalar,,float,range0,1,Non-REM depth index
+ROW,epoch,n3emotionalgate,scalar,,float,range0,1,N3EmotionalStabilizationGate
+
+ROW,epoch,eligibilityE,scalar,,float,range0,1,E = S*(1-R)*Es
+ROW,epoch,psychriskR,scalar,,float,range0,1,Psych-risk scalar
+ROW,epoch,enstasisEs,scalar,,float,range0,1,Stability / enstasis
+ROW,epoch,stabilityscore,scalar,,float,range0,1,NeuroswarmGuard stability
+ROW,epoch,mentalscarcity,scalar,,float,range0,1,MentalScarcityProfile scalar
+ROW,epoch,fearweight,scalar,,float,range0,1,FearWeightProfile scalar
+ROW,epoch,quantumfearlane,scalar,,string,MindSimBoundaryRealRiskBlock,QuantumFearChannel lane
+
+ROW,epoch,qscalar,scalar,,float,range0,10,QuantumRatioScaling session factor
+ROW,epoch,sessiontype,scalar,,string,NeutralDreamGamingNightmareRealming,string,nonnull,Session label
+
+ROW,epoch,nightmarezoneflag,scalar,,bool,default,false,Nightmare-capable zone open
+ROW,epoch,nightmareintensityband,scalar,,int,range0,3,0=off,1=low,2=moderate,3=high
+ROW,epoch,escaperoutevisible,scalar,,bool,default,true,UI/UX escape route visible
+ROW,epoch,escaperoutepenaltyscore,scalar,,float,range0,0,Must remain 0 for non-punitive exits
+
+ROW,epoch,angerdeltatag,scalar,,float,range-5,5,Cohort-only anger delta tag
+ROW,epoch,consolehourschangetag,scalar,,float,range-112,112,Per-night console hour change
+ROW,epoch,epochhex,scalar,,hex16,nonnull,Spectral commitment for audit
+
+SECTION,MODE-RULES
+ROW,mode,rule,condition,MayRunNightmareRealming,
+eligibilityE>=0.5 AND psychriskR<=0.4 AND mentalscarcity<0.4
+AND quantumfearlane="MindSim" AND n3emotionalgate>=0.72
+AND (pN2+pN3)>=0.8,string,readonly,Hard gate for horror scenes
+
+ROW,mode,rule,condition,ForceSafeRoomOnBoundaryOrRealRisk,
+IF quantumfearlane!="MindSim" THEN nightmareintensityband=0
+AND sessiontype="Neutral"
+AND escaperoutevisible=true,string,readonly,Block threat content outside MindSim
+
+ROW,mode,rule,condition,MonotoneInPsychRiskBands,
+IF psychriskR>=0.4 THEN nightmareintensityband<=1,string,readonly,No high bands at elevated risk
+
+ROW,mode,rule,condition,NonAddictiveLoopGuard,
+IF nightmareintensityband>0 THEN maxNightmareEpochsPerNight<=
+CONFIG.maxNightmareEpochsPerNight,string,readonly,Dose ceiling per night
+
+SECTION,NEURORIGHTS
+ROW,rights,policy,flag,mentalprivacy,true,bool,nonwaivable,No raw dream content in this shard
+ROW,rights,policy,flag,cognitiveliberty,true,bool,nonwaivable,Opt-out never alters civil access
+ROW,rights,policy,flag,mentalintegrity,true,bool,nonwaivable,No RealRisk threat emulation
+ROW,rights,policy,flag,nopunitivexr,true,bool,nonwaivable,No punishment or leverage via horror
+ROW,rights,policy,flag,noncommercialneuraldata,true,bool,nonwaivable,No sale of neural/fear metrics
+ROW,rights,policy,flag,nopersonscoring,true,bool,nonwaivable,No reputation/karma from nightmares
+
+SECTION,LEDGER
+ROW,ledger,ledger,scalar,eventid,,string,primarykey,Ledger event id
+ROW,ledger,ledger,scalar,epochid,,int,refEPOCH.epochid,Linked epoch
+ROW,ledger,ledger,enum,eventtype,,string,
+nightmare-start,nightmare-end,safety-throttle,unsafe-defer,ethics-breach,Event type
+ROW,ledger,ledger,scalar,eligibilityEsnapshot,,float,range0,1,E at event
+ROW,ledger,ledger,scalar,psychriskRsnapshot,,float,range0,1,R at event
+ROW,ledger,ledger,scalar,mentalscarcitysnapshot,,float,range0,1,MentalScarcity at event
+ROW,ledger,ledger,scalar,quantumfearlanesnapshot,,string,MindSimBoundaryRealRiskBlock,Fear lane at event
+ROW,ledger,ledger,flag,neurorightsinvariantsheld,true,bool,nonnull,All neurorights flags held
+
+SECTION,AIPOLICY
+ROW,aipolicy,scalar,aipolicyriskscore,0.0,float,range0,1,Risk-to-harm score for AI-tuned params
+ROW,aipolicy,scalar,humanapproved,0,bool,default,false,Human approval for high-risk configs
+
+FOOTER,END-OF-SHARD
